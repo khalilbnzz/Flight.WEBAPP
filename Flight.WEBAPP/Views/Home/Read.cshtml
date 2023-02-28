@@ -1,0 +1,35 @@
+﻿@model FlightModel
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="text-center">
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.data[0].airline.name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.data[0].departure.airport)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.data[0].arrival.airport)
+            </th>
+            <th></th>
+        </tr>
+        @foreach (var item in Model.data)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.airline.name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.departure.airport)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.arrival.airport)
+                </td>
+            </tr>
+        }
+    </table>
+</div>
