@@ -3,6 +3,15 @@ using System.Xml.Linq;
 
 namespace Flight.WEBAPP.Common.Models
 {
+    public class AirportResponse
+    {
+        public string latitude { get; set; }
+        public string longitude { get; set; }
+        public string code { get; set; }
+        public string IATA { get; set; }
+        public string ICAO { get; set; }
+        public string distance_meters { get; set; }
+    }
     public class FlightResponse
     {
         public Pagination pagination { get; set; }
@@ -49,6 +58,8 @@ namespace Flight.WEBAPP.Common.Models
     {
         public string flight_date { get; set; }
         public string flight_status { get; set; }
+        public string flight_time { get; set; }
+        public string distance { get; set; }
         public Departure departure { get; set; }
         public Arrival arrival { get; set; }
         public Airline airline { get; set; }
@@ -79,6 +90,8 @@ namespace Flight.WEBAPP.Common.Models
         public string number { get; set; }
         public string iata { get; set; }
         public string icao { get; set; }
+        public string lag { get; set; }
+        public string lon { get; set; }
         public Codeshared codeshared { get; set; }
     }
 

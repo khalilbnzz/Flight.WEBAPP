@@ -15,6 +15,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.data[0].arrival.airport)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.data[0].flight_time)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.data[0].distance)
+            </th>
             <th></th>
         </tr>
         @foreach (var item in Model.data)
@@ -29,6 +35,12 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.arrival.airport)
                 </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.flight_time)
+                </td>
+                    <td>
+                    @Html.DisplayFor(modelItem => item.distance) KM
+                    </td>
             </tr>
         }
     </table>

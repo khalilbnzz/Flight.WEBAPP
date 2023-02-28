@@ -3,5 +3,6 @@
     public class AppConfiguration
     {
         public FlightAPIKEY flightAPIKEY { get; set; }
+        public AirportAppSetting airportAppSetting { get; set; }
     }
 }

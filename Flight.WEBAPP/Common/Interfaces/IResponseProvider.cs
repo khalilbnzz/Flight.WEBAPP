@@ -2,6 +2,8 @@
 {
     public interface IResponseProvider
     {
-        HttpResponseMessage GetAPIResponse(out string pResponse);
+        HttpResponseMessage GetListFlightResponse(out string pResponse);
+        HttpResponseMessage GetAirPortDetailsResponse(string pIataCode, out string pResponse);
+        HttpResponseMessage GetAirPortDetailsResponse(string pLat, string pLon, out string pResponse);
     }
 }
