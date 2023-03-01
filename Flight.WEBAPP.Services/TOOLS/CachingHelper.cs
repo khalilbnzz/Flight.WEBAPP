@@ -26,6 +26,16 @@ namespace Flight.WEBAPP.Services.TOOLS
             return pClass;
         }
 
+        public async Task<Dictionary<int, T>> GetSetAsyncDictionnary<T>(string pKey, Dictionary<int, T> keyValues)
+        {
+            //GET CACHE IF EXIST
+            var output = _memoryCache.Get<Dictionary<int, T>>(pKey);
+            if (output is not null) return output;
+            
+
+            _memoryCache.Set(pKey, keyValues, TimeSpan.FromMinutes(10));
+            return keyValues;
+        }
 
         public T GetValue<T>(string pKey)
         {

@@ -10,6 +10,8 @@ namespace Flight.WEBAPP.Services.TOOLS
     {
         Task<T> GetSetAsyncList<T>(string pKey, T pClass);
 
+        Task<Dictionary<int, T>> GetSetAsyncDictionnary<T>(string pKey, Dictionary<int, T> keyValues);
+
         void SetValue<T>(string pKey, T pValue);
 
         T GetValue<T>(string pKey);

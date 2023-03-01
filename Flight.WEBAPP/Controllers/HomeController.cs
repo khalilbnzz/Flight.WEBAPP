@@ -42,10 +42,12 @@ namespace Flight.WEBAPP.Controllers
             {
                 responseAPI = _response.GetListFlightResponse(out string pResponse);
                 flightData = JsonConvert.DeserializeObject<FlightResponse>(pResponse);
-                
+                int i = 0;
                 flightModel.data = new List<Datuma>();
+                Dictionary<int, Datuma> keyValues = new Dictionary<int, Datuma>();
                 foreach (var item in flightData.data.Take(5).Where(x => x.flight_date.Equals(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"))).OrderByDescending(x=>x.flight_date).ToList())
                 {
+                    
                     Datuma data = new Datuma
                     {
                         aircraft = item.aircraft,
@@ -56,13 +58,17 @@ namespace Flight.WEBAPP.Controllers
                         flight_date = item.flight_date,
                         flight_status = item.flight_status,
                         live = item.live,
-                        flight_time = item.arrival.estimated.Subtract(item.departure.estimated).ToString()
+                        flight_time = item.arrival.estimated.Subtract(item.departure.estimated).ToString(),
+                        Identifier = i
                     };
 
                     flightModel.data.Add(data);
+                    keyValues.Add(i, data);
+                    i++;
                 }
                 
                 _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), flightModel);
+                _caching.GetSetAsyncDictionnary<Datuma>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), keyValues);
             }
             else
             {
@@ -70,7 +76,7 @@ namespace Flight.WEBAPP.Controllers
             }
             if (vol != null)
             {
-
+                var lastIdentifier = flightModel.data.LastOrDefault().Identifier;
                 flightModel.data.Add(new Datuma
                 {
                     flight_date = vol.HeureDepart.ToString(),
@@ -78,7 +84,8 @@ namespace Flight.WEBAPP.Controllers
                     flight = new Flight.WEBAPP.Common.Models.Flight
                     {
                         number = vol.NumeroVol
-                    }
+                    },
+                    Identifier = lastIdentifier + 1
                 });
             }
             return View(flightModel);
@@ -89,6 +96,7 @@ namespace Flight.WEBAPP.Controllers
         {
 
             var flightModel = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), null).Result;
+            var flightModelBeta = _caching.GetSetAsyncDictionnary<Datuma>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), null).Result;
             if (flightModel != null && flightModel.data.Count != 0)
             {
                 flightModel = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")+"_"+ numVol, flightModel).Result;

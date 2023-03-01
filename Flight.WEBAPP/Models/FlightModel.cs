@@ -31,6 +31,7 @@ namespace Flight.WEBAPP.Models
         public string lon { get; set; }
         public object aircraft { get; set; }
         public object live { get; set; }
+        public int Identifier { get; set; }
     }
 
     public class GeoCordinations
