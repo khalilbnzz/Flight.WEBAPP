@@ -22,8 +22,6 @@ namespace Flight.WEBAPP.Services.TOOLS
             if (output is not null) return output;
             if (output is null && pClass is null) return pClass;
 
-            await Task.Delay(3000);
-
             _memoryCache.Set(pKey, pClass, TimeSpan.FromMinutes(10));
             return pClass;
         }

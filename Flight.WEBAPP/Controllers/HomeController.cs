@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Geolocation;
 using System.Globalization;
 using System.Data;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Flight.WEBAPP.Controllers
 {
@@ -43,7 +44,7 @@ namespace Flight.WEBAPP.Controllers
                 flightData = JsonConvert.DeserializeObject<FlightResponse>(pResponse);
                 
                 flightModel.data = new List<Datuma>();
-                foreach (var item in flightData.data.Where(x => x.flight_date.Equals(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"))).OrderByDescending(x=>x.flight_date).Take(20).ToList())
+                foreach (var item in flightData.data.Take(5).Where(x => x.flight_date.Equals(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"))).OrderByDescending(x=>x.flight_date).ToList())
                 {
                     Datuma data = new Datuma
                     {
@@ -61,7 +62,7 @@ namespace Flight.WEBAPP.Controllers
                     flightModel.data.Add(data);
                 }
                 
-                _caching.GetSetAsyncList<FlightModel>(DateTime.Now.ToString("yyyy-MM-dd"), flightModel);
+                _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), flightModel);
             }
             else
             {
@@ -91,58 +92,71 @@ namespace Flight.WEBAPP.Controllers
             if (flightModel != null && flightModel.data.Count != 0)
             {
                 flightModel = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")+"_"+ numVol, flightModel).Result;
-
-                var valueDetails = flightModel.data.Where(x => x.flight.number.Equals(numVol)).FirstOrDefault();
-                flightModel = new FlightModel();
-
-                #region Coordinate GPS
-                var respDepart = _response.GetAirPortDetailsResponse(valueDetails.departure.iata, out string pResponseDepart);
-                var desDepart = JsonConvert.DeserializeObject<AirportResponse>(pResponseDepart);
-                GeoCordinations geoDepart = new GeoCordinations
+                var flightOF = flightModel.data.FirstOrDefault(x => x.flight is null);
+                if (flightOF != null)
                 {
-                    Latitude = desDepart.latitude,
-                    Longiture = desDepart.longitude,
-                };
-                var respArr = _response.GetAirPortDetailsResponse(valueDetails.arrival.iata, out string pResponseArr);
-                var desArri = JsonConvert.DeserializeObject<AirportResponse>(pResponseArr);
-
-                GeoCordinations geoArrive = new GeoCordinations
-                {
-                    Latitude = desArri.latitude,
-                    Longiture = desArri.longitude
-                };
-
-                Coordinate origin = new Coordinate { Latitude = Convert.ToDouble(geoDepart.Latitude, CultureInfo.InvariantCulture), Longitude = Convert.ToDouble(geoDepart.Longiture, CultureInfo.InvariantCulture) };
-                Coordinate destination = new Coordinate { Latitude = Convert.ToDouble(geoArrive.Latitude, CultureInfo.InvariantCulture), Longitude = Convert.ToDouble(geoArrive.Longiture, CultureInfo.InvariantCulture) };
-                #endregion
-
-                double distance = GeoCalculator.GetDistance(origin, destination, 1) / 1000;
-                valueDetails.distance = distance.ToString();
-                flightModel.data.Add(valueDetails);
-                return View(flightModel);
-            }
-            else
-            {
-                var vol = _caching.GetValue<VolModel>(String.Concat(DateTime.Now.ToString("ddMMyyy"), "DB"));
-                flightModel.data.Add(new Datuma
-                {
-                    flight_time = vol.HeureArrive.Subtract(vol.HeureDepart).ToString(),
-                    distance = "",
-                    departure = new Departure
+                    var flight = flightModel.data.Find(x => x.flight.number == numVol);
+                    if (flight != null)
                     {
-                        airport = vol.AeroportDepart
-                    },
-                    arrival = new Arrival
-                    {
-                        airport = vol.AeroportArrive
-                    },
-                    airline = new Airline
-                    {
-                        name = vol.ModelAvion
+                        flightModel = new FlightModel();
+
+                        #region Coordinate GPS
+                        var respDepart = _response.GetAirPortDetailsResponse(flight.departure.iata, out string pResponseDepart);
+                        var desDepart = JsonConvert.DeserializeObject<AirportResponse>(pResponseDepart);
+                        GeoCordinations geoDepart = new GeoCordinations
+                        {
+                            Latitude = desDepart.latitude,
+                            Longiture = desDepart.longitude,
+                        };
+                        var respArr = _response.GetAirPortDetailsResponse(flight.arrival.iata, out string pResponseArr);
+                        var desArri = JsonConvert.DeserializeObject<AirportResponse>(pResponseArr);
+
+                        GeoCordinations geoArrive = new GeoCordinations
+                        {
+                            Latitude = desArri.latitude,
+                            Longiture = desArri.longitude
+                        };
+
+                        Coordinate origin = new Coordinate { Latitude = Convert.ToDouble(geoDepart.Latitude, CultureInfo.InvariantCulture), Longitude = Convert.ToDouble(geoDepart.Longiture, CultureInfo.InvariantCulture) };
+                        Coordinate destination = new Coordinate { Latitude = Convert.ToDouble(geoArrive.Latitude, CultureInfo.InvariantCulture), Longitude = Convert.ToDouble(geoArrive.Longiture, CultureInfo.InvariantCulture) };
+                        #endregion
+
+                        double distance = GeoCalculator.GetDistance(origin, destination, 1) / 1000;
+                        flight.distance = distance.ToString();
+                        flightModel.data.Add(flight);
+                        return View(flightModel);
                     }
+                }
+                else
+                {
+                    var vol = _caching.GetValue<VolModel>(String.Concat(DateTime.Now.ToString("ddMMyyy"), "DB"));
+                    if (vol == null)
+                    {
+                        return View();
+                    }
+                    flightModel = new FlightModel();
+                    flightModel.data.Add(new Datuma
+                    {
+                        flight_time = vol.HeureArrive.Subtract(vol.HeureDepart).ToString(),
+                        distance = "",
+                        departure = new Departure
+                        {
+                            airport = vol.AeroportDepart
+                        },
+                        arrival = new Arrival
+                        {
+                            airport = vol.AeroportArrive
+                        },
+                        airline = new Airline
+                        {
+                            name = vol.ModelAvion
+                        }
 
-                });
+                    });
+                }
+
             }
+            
             return View(flightModel);
         }
 
