@@ -27,5 +27,27 @@ namespace Flight.WEBAPP.Services.TOOLS
             _memoryCache.Set(pKey, pClass, TimeSpan.FromMinutes(10));
             return pClass;
         }
+
+
+        public T GetValue<T>(string pKey)
+        {
+            _memoryCache.TryGetValue(pKey, out T Value);
+            return Value;
+        }
+
+        public T GetValueLike<T>(string pValue)
+        {
+            return default(T);
+        }
+
+        public void Remove(string pKey)
+        {
+            _memoryCache.Remove(pKey);
+        }
+
+        public void SetValue<T>(string pKey, T pValue)
+        {
+            _memoryCache.Set(pKey, pValue, TimeSpan.FromMinutes(20));
+        }
     }
 }
