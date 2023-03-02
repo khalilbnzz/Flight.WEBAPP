@@ -42,10 +42,7 @@
                     @Html.DisplayFor(modelItem => item.distance) KM
                     </td>
             </tr>
-            if (item.distance.Equals(""))
-            {
-                @Html.ActionLink("Editer", "Edit", new { numVol=item.flight.number })
-            }
+          
         }
     </table>
     

@@ -4,6 +4,7 @@
 }
 
 <div class="text-center">
+    <h3>API</h3>
     <table class="table">
         <tr>
             <th>
@@ -25,6 +26,34 @@
                 </td>
                 <td>
                     @Html.ActionLink("Details", "Read", new { numVol=item.flight.number })
+                </td>
+            </tr>
+        }
+    </table>
+
+    <h3>CREATED</h3>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.dataVol[0].ModelAvion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.dataVol[0].VilleDepart)
+            </th>
+            <th></th>
+        </tr>
+        @foreach (var item in Model.dataVol)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModelAvion)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.VilleDepart)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "ReadCreated", new { numVol=item.NumeroVol , created = true  }) |
+                    @Html.ActionLink("Edit", "Edit", new {  numVol=item.NumeroVol , created = true})
                 </td>
             </tr>
         }

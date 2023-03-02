@@ -1,0 +1,50 @@
+﻿@model FlightModel
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="text-center">
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.dataVol[0].VilleDepart)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.dataVol[0].VilleArrive)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.dataVol[0].HeureDepart)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.dataVol[0].HeureArrive)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.dataVol[0].ModelAvion)
+            </th>
+            <th></th>
+        </tr>
+        @foreach (var item in Model.dataVol)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.VilleDepart)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.VilleArrive)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HeureDepart)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HeureArrive)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModelAvion) 
+                </td>
+               
+            </tr>
+          
+        }
+    </table>
+    
+</div>

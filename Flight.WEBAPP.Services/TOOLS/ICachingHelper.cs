@@ -9,6 +9,7 @@ namespace Flight.WEBAPP.Services.TOOLS
     public interface ICachingHelper
     {
         Task<T> GetSetAsyncList<T>(string pKey, T pClass);
+        Task<string> GetSetAsyncListString<String>(string pKey, string pJson);
 
         Task<Dictionary<int, T>> GetSetAsyncDictionnary<T>(string pKey, Dictionary<int, T> keyValues);
 

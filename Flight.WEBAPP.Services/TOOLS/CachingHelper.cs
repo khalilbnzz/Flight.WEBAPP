@@ -26,6 +26,17 @@ namespace Flight.WEBAPP.Services.TOOLS
             return pClass;
         }
 
+        public async Task<string> GetSetAsyncListString<String>(string pKey, string pJson)
+        {
+            //GET CACHE IF EXIST
+            var output = _memoryCache.Get<string>(pKey);
+            if (output is not null) return output;
+            if (output is null && pJson is null) return pJson;
+
+            _memoryCache.Set(pKey, pJson, TimeSpan.FromMinutes(10));
+            return pJson;
+        }
+
         public async Task<Dictionary<int, T>> GetSetAsyncDictionnary<T>(string pKey, Dictionary<int, T> keyValues)
         {
             //GET CACHE IF EXIST
@@ -57,5 +68,7 @@ namespace Flight.WEBAPP.Services.TOOLS
         {
             _memoryCache.Set(pKey, pValue, TimeSpan.FromMinutes(20));
         }
+
+      
     }
 }

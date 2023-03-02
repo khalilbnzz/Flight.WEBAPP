@@ -4,5 +4,6 @@
     {
         public FlightAPIKEY flightAPIKEY { get; set; }
         public AirportAppSetting airportAppSetting { get; set; }
+        public AIRLABS AirLabs { get; set; }
     }
 }
