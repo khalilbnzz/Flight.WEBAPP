@@ -20,10 +20,28 @@ namespace Flight.WEBAPP.Services.TOOLS
             //GET CACHE IF EXIST
             var output = _memoryCache.Get<T>(pKey);
             if (output is not null) return output;
-            if (output is null && pClass is null) return pClass;
+            if (output is null && pClass is not null) return pClass;
 
             _memoryCache.Set(pKey, pClass, TimeSpan.FromMinutes(10));
             return pClass;
+        }
+
+        public async Task<T> SetAsyncList<T>(string pKey, T pClass)
+        {
+            _memoryCache.Set(pKey, pClass, TimeSpan.FromMinutes(10));
+            return pClass;
+        }
+        public async Task<T> GetRemoveSetAsyncList<T>(string pKey, T pClass)
+        {
+            _memoryCache.Remove(pKey);
+            _memoryCache.Set(pKey, pClass, TimeSpan.FromMinutes(10));
+            return pClass;
+        }
+
+        public async Task<T> GetCache<T>(string pKey)
+        {
+            _memoryCache.TryGetValue(pKey, out var output);
+            return (T)output;
         }
 
         public async Task<string> GetSetAsyncListString<String>(string pKey, string pJson)

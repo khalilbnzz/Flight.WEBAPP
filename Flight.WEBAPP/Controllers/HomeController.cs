@@ -30,24 +30,20 @@ namespace Flight.WEBAPP.Controllers
 
         public IActionResult Index()
         {
-            var RespoAllFlight = _response.GetAirPlaneInfo(out string pResponseInfo);
 
             FlightModel flightModel = new FlightModel();
-            if (flightModel.data == null)
-            {
-                flightModel.data = new List<Datuma>();
-            }
-            var getList = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), null);
+
+            var getList = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), flightModel);
+            var getListCreated = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), flightModel);
             HttpResponseMessage responseAPI = null;
             FlightResponse flightData = null;
             
-            if (getList.Result == null)
+            if (getList.Result == null || !getList.Result.data.Any())
             {
                 responseAPI = _response.GetListFlightResponse(out string pResponse);
                 flightData = JsonConvert.DeserializeObject<FlightResponse>(pResponse);
                 int i = 0;
-                flightModel.data = new List<Datuma>();
-                Dictionary<int, Datuma> keyValues = new Dictionary<int, Datuma>();
+                
                 foreach (var item in flightData.data.Take(5).Where(x => x.flight_date.Equals(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"))).OrderByDescending(x=>x.flight_date).ToList())
                 {
                     
@@ -65,25 +61,13 @@ namespace Flight.WEBAPP.Controllers
                         Identifier = i
                     };
 
-                    flightModel.data.Add(data);
-                    keyValues.Add(i, data);
+                    getList.Result.data.Add(data);
                     i++;
                 }
-                
-            }
-            else
-            {
-                flightModel = new FlightModel();
                 flightModel = getList.Result;
-            }
+                flightModel.dataVol = getListCreated.Result.dataVol;
+            }  
             var vol = _caching.GetSetAsyncList<VolModel>(DateTime.Now.ToString("yyyy-MM-dd"), null);
-            if (vol.Result != null)
-            {
-                flightModel.dataVol = new List<VolModel> { vol.Result };
-            }
-            
-            _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), flightModel);
-
             return View(flightModel);
         }
 
@@ -193,7 +177,7 @@ namespace Flight.WEBAPP.Controllers
             }
             else
             {
-                flightModel = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), null).Result;
+                flightModel = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), null).Result;
                 
                 if (flightModel.dataVol.Count != 0)
                 {
@@ -226,18 +210,26 @@ namespace Flight.WEBAPP.Controllers
             try
             {
 
-                var vol = _caching.GetSetAsyncList<VolModel>(DateTime.Now.ToString("yyyy-MM-dd"), null);
+                var vol = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), null);
                 
-                if (vol.Result == null)
+                if (vol.Result == null || vol.Result.dataVol.FirstOrDefault(x=>x.NumeroVol.Equals(pModel.NumeroVol)) == null)
                 {
                     if (ModelState.IsValid)
                     {
                         _caching.GetSetAsyncList<VolModel>(DateTime.Now.ToString("yyyy-MM-dd"), pModel);
-                        var flightModel = new FlightModel
+                        FlightModel fl = new FlightModel();
+                        fl.dataVol.Add(new VolModel
                         {
-                            dataVol = new List<VolModel> { pModel }
-                        };
-                        _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), flightModel);
+                            NumeroVol = pModel.NumeroVol,
+                            AeroportArrive = pModel.AeroportArrive,
+                            AeroportDepart = pModel.AeroportDepart,
+                            HeureArrive = pModel.HeureArrive,
+                            HeureDepart = pModel.HeureDepart,
+                            ModelAvion = pModel.ModelAvion,
+                            VilleArrive = pModel.VilleArrive,
+                            VilleDepart = pModel.VilleDepart
+                        });
+                        _caching.SetAsyncList<FlightModel>(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), fl);
                         return RedirectToAction("Index");
                     }
                 }
@@ -263,7 +255,7 @@ namespace Flight.WEBAPP.Controllers
             {
                 return View(null);
             }
-            var vol = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"), null);
+            var vol = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), new FlightModel());
             var volF = vol.Result.dataVol.FirstOrDefault(x => x.NumeroVol.Equals(numVol));
             VolModel pModel = new VolModel
             {
@@ -276,8 +268,25 @@ namespace Flight.WEBAPP.Controllers
                 VilleArrive = volF.VilleArrive,
                 VilleDepart = volF.VilleDepart
             };
-
+            ViewBag.numVol = numVol;
             return View(pModel);
+        }
+
+
+        //NOT WORKING YET
+        public ActionResult Edit(VolModel pModel)
+        {
+            string numeVol = Request.Form["NumeVol"];
+            var vol = _caching.GetSetAsyncList<FlightModel>(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), null);
+            var volF = vol.Result.dataVol.FirstOrDefault(x => x.NumeroVol == numeVol);
+
+
+            var CacheElements2 = _caching.GetCache<FlightModel>(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"));
+            var volNew = CacheElements2.Result.dataVol.FirstOrDefault(x => x.NumeroVol.Equals(numeVol));
+
+            _caching.GetRemoveSetAsyncList<VolModel>(DateTime.Now.ToString("yyyy-MM-dd"), volF);
+
+            return RedirectToAction("Index");
         }
     }
 }

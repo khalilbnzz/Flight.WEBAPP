@@ -21,6 +21,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.dataVol[0].ModelAvion)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.dataVol[0].Vitesse)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.dataVol[0].Consommation)
+            </th>
             <th></th>
         </tr>
         @foreach (var item in Model.dataVol)
@@ -40,6 +46,12 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ModelAvion) 
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Vitesse) 
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Consommation)
                 </td>
                
             </tr>

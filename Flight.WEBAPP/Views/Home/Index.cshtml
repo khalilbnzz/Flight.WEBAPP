@@ -31,7 +31,7 @@
         }
     </table>
 
-    <h3>CREATED</h3>
+    <h3>MEMORY CACHE</h3>
     <table class="table">
         <tr>
             <th>
@@ -52,8 +52,8 @@
                     @Html.DisplayFor(modelItem => item.VilleDepart)
                 </td>
                 <td>
-                    @Html.ActionLink("Details", "ReadCreated", new { numVol=item.NumeroVol , created = true  }) |
-                    @Html.ActionLink("Edit", "Edit", new {  numVol=item.NumeroVol , created = true})
+                    @Html.ActionLink("Details", "ReadCreated", new { numVol=item.NumeroVol , created = true  })
+                    @*| @Html.ActionLink("Edit", "Edit", new {  numVol=item.NumeroVol , created = true})*@
                 </td>
             </tr>
         }

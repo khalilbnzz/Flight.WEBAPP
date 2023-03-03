@@ -56,10 +56,27 @@ namespace Flight.WEBAPP.Models
         public DateTime HeureArrive { get; set; }
         [Display(Name = "Avion")]
         public string ModelAvion { get; set; }
+        [Display(Name = "Ville Depart")]
         public string VilleDepart { get; set; }
+        [Display(Name = "Ville Arrivee")]
         public string VilleArrive { get; set; }
+        [Display(Name = "Aeroport Depart")]
         public string AeroportDepart { get; set; }
+        [Display(Name = "Aeroport Arrive")]
         public string AeroportArrive { get; set; }
+        [Display(Name = "Numero du vol")]
         public string NumeroVol { get; set; }
+        
+        private double _vitesse = 459.0;
+        [Display(Name = "Vitesse Moyenne")]
+        public double Vitesse
+        {
+            get { return _vitesse; }
+        }
+        [Display(Name = "Consommation Moyenne")]
+        public double Consommation
+        {
+            get { return _vitesse * 29; }
+        }
     }
 }
